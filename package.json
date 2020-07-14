@@ -4,7 +4,8 @@
   "description": "Una aplicación MVC usando el motor de vistas Pug.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
