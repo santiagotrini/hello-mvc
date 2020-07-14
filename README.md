@@ -125,10 +125,213 @@ const router = require('./routes/index');
 app.use('/', router);
 ```
 
-## Las vistas
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
 ## El controlador
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+El controlador tiene que definir las dos funciones que usamos en el router y tiene que exportarlas. Además va a hacer uso del modelo, así que lo importamos en la primera línea.
+
+```js
+// controllers/index.js
+const User = require('../models/User');
+
+exports.home = (req, res) => {
+  res.send('Implementar');
+};
+
+exports.search = (req, res) => {
+  res.send('Implementar')
+}
+```
+
+En este punto la aplicación responde a las rutas `localhost:3000/` y `localhost:3000/search` aunque con un mensaje de texto. Vamos ahora a definir las vistas para empezar a ver nuestra UI.
+
+## La vista
+
+Si bien tenemos tres archivos dentro de `views` la app tiene una sola vista. Lo separo en tres archivos distintos para mostrar un poco lo que podemos hacer con Pug, pero podríamos tener toda la plantilla en un solo archivo.
+
+El archivo `layout.pug` define la estructura básica del HTML que vamos a enviar al cliente. Acá tenemos un esqueleto básico de una página web, los elementos `html`, `head` y `body`.
+
+```jade
+doctype html
+html(lang='es')
+  head
+    include head.pug
+  body
+    div.container.mt-3
+      block content
+```
+
+En Pug la indentación es importante, los dos espacios de indentación entre `html` y `head` o `body` indican que esos elementos están anidados. Usen espacios para indentar, yo doy dos espacios de indentación. Los elementos de HTML tienen los nombres habituales, como `div`, `p` o `h1`.
+
+Para indicar los atributos de un elemento lo hacemos dentro de paréntesis como en `html(lang='es')`. Si el atributo es una clase podemos hacerlo con `.` como en `div.container.mt-3` que es equivalente al HTML `<div class="container mt-3"></div>`. Podemos hacer lo mismo con el atributo `id` usando `#`.
+
+La palabra clave `include` en Pug como en `include head.pug` indica que los contenidos del archivo `head.pug` se van a reemplazar debajo del elemento `head`. Por último el `block content` debajo del `div` indica que vamos a usar [herencia](https://pugjs.org/language/inheritance.html) y el archivo `layout.pug` no es más que una plantilla para posiblemente más de una página distinta.
+
+En `head.pug` tenemos las etiquetas requeridas para usar Bootstrap y el título de la página.
+
+```jade
+meta(charset='utf-8')
+meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+title Hello MVC
+```
+
+El archivo `index.pug` es nuestro contenido principal, la UI va a ser la misma que la otra vez: un _input_ de texto, un botón y una tabla. Para heredar la estructura básica del archivo `layout.pug` usamos `extends layout` en la primer línea y luego especificamos el bloque de contenido.
+
+```jade
+extends layout
+
+block content
+  h1 Hello MVC
+  p Ingresá el ID del usuario que querés buscar.
+  hr
+  table
+    thead
+      th id
+      th Nombre
+      th Email
+      th Cumpleaños
+      th Edad
+    tbody
+  hr
+  h4 Más info en
+    a(href='#') MDN  
+```
+
+Podemos ver como quedó, pero primero tenemos que volver al controlador y actualizar la función `home()`. Usamos `res.render()` en Express para responder al cliente con HTML de una vista. Ya podemos ver nuestra interfaz en `http://localhost:3000`.
+
+```js
+// controllers/index.js
+exports.home = (req, res) => {
+  res.render('index');
+};
+```
+
+Vemos que la tabla necesita algunas clases de Bootstrap.
+
+```jade
+table.table.table-striped
+  thead.thead-dark
+    th id
+    th Nombre
+    th Email
+```
+
+Ahora agregamos el formulario para buscar usuarios por ID, lo hacemos entre el párrafo y el primer `hr`.
+
+```jade
+form.form-inline(action='/search' method='get')
+  div.form-group.mr-sm-3
+    input.form-control(type='text' name='id' placeholder='ID')
+  input.form-control.btn.btn-primary(type='submit' value='Buscar')
+```
+
+Se trata de un elemento `form` con la clase de Bootstrap `form-inline` y con los atributos `action` y `method`.
+Dentro del formulario tenemos un _input_ de tipo texto encerrado en un `div` con clases varias de Bootstrap para el formato. Es importante el atributo `name` del _input_ ya que vamos a usar el valor de ese atributo para recuperar el valor ingresado. Por último usamos un _input_ de tipo `submit` que se muestra como un botón.
+
+Si ponemos un 1 y enviamos el formulario nos envía a la ruta `localhost:3000/search?id=1`.
+La ruta `/search` sale del atributo `action` del formulario. Lo que va desde el signo de pregunta al final (`?id=1`) es lo que se conoce como un _query string_. Es una parte especial de la URL que podemos usar en nuestro caso para hacer la _query_ correcta a la base de datos. En Express la _query string_ la podemos encontrar en el objeto `req`, específicamente en `req.query`.
+
+## De nuevo al controlador
+
+Tenemos que implementar las funciones que dejamos pendientes en `controllers/index.js`. Vamos a usar el modelo `User` para realizar las _queries_ a la base de datos. La función que se ejecuta para la primera carga de la página necesita traer todos los usuarios. Podemos usar `User.find()`.
+
+```js
+// controllers/index.js
+exports.home = (req, res) => {
+  User.find().sort('id').exec((err, users) => {
+    res.render('index', { users: users });
+  });
+};
+```
+
+Con este código traemos todos los usuarios, los ordenamos por ID y mandamos la vista con un segundo argumento, un objeto que contiene el resultado de la _query_.
+
+Podemos ver el contenido de este objeto en la vista de la siguiente manera. En `index.pug` debajo del primer `hr` y antes de la tabla agreguen:
+
+```jade
+pre= users
+```
+
+Ahora tenemos que manipular un poco el resultado de la _query_ para poder usarlo en la tabla. La función `home()` quedaría finalmente así, de esta manera le agregamos la propiedad `age` a cada objeto de la colección.
+
+```js
+// controllers/index.js
+exports.home = (req, res) => {
+  User.find().sort('id').exec((err, users) => {
+    for (let user of users) {
+      user.age = Math.trunc((new Date() - user.birthday) / 31536000000);
+    }
+    res.render('index', { users: users });
+  });
+};
+```
+
+Para terminar con el controlador implementamos la función que corresponde a la búsqueda por ID.
+
+```js
+// controllers/index.js
+exports.search = (req, res) => {
+  let result = null;
+  User.findOne({ id: req.query.id }).exec((err, user) => {
+    if (user != null) {
+      user.age = Math.trunc((new Date() - user.birthday) / 31536000000);
+      result = [user];
+    }
+    res.render('index', { users: result });
+  })
+}
+```
+
+Esta función se ejecuta para la ruta `/search?id=*` (reemplazar el asterisco por lo que haya en el input del formulario).  Como dijimos antes eso está en `req.query` como la clave es `id` en `req.query.id` tenemos lo que está a la derecha del igual. Usamos `User.findOne()` y si el resultado (`user`) es distinto de `null` entonces calculamos la edad y lo metemos dentro de un array (`result`). Por último enviamos a la vista el resultado en el objeto `{ users: result }`. Si el resultado de la _query_ es `null` porque pusimos algún ID inexistente, entonces la propiedad `users` del objeto que se envía a la vista vale `null`.
+
+Ahora podemos volver a la vista para armar la tabla y terminar la app.
+
+## Condicionales e iteración en Pug
+
+Hay dos posibilidades, o el controlador le pasa datos en `users` a la vista o no le pasa nada (`null`). Podemos mostrar la tabla en función de esto con un `if ... else` en Pug. Entre los dos `hr` de `index.pug`.
+
+```jade
+hr
+pre= users
+if users
+  table.table.table-striped
+    thead.thead-dark
+      th id
+      th Nombre
+      th Email
+      th Cumpleaños
+      th Edad
+    tbody    
+else
+  h3 No hay resultados      
+hr
+```
+
+Que dice básicamente que si `users` no es `null` muestre la tabla y sino el `h3` que dice que no hay resultados.
+
+Ya casi estamos, faltan las filas de la tabla en el `tbody`. Podemos usar `each ... in` para iterar un array en Pug de modo similar a un ciclo for. También eliminamos el elemento `pre` que pusimos antes.
+
+```jade
+hr
+if users
+  table.table.table-striped
+    thead.thead-dark
+      th id
+      th Nombre
+      th Email
+      th Cumpleaños
+      th Edad
+    tbody    
+      each user in users
+        tr
+          td= user.id
+          td= user.name
+          td= user.mail
+          td= user.birthday.toLocaleDateString('es-AR')
+          td= user.age
+else
+  h3 No hay resultados      
+hr
+```
+
+Para cada elemento `user` en el array `users` creamos un `tr` con los cinco `td` usando los valores correspondientes. Y listo, la app está terminada. La pushean a un repo en GitHub, la conectan con Heroku configuran la variable `MONGODB_URI` como hicieron para [hello-database](https://github.com/santiagotrini/hello-database) y listo.
