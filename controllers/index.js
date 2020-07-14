@@ -1,7 +1,7 @@
 const User = require('../models/User');
 
 exports.home = (req, res) => {
-  User.find().exec((err, users) => {
+  User.find().sort('id').exec((err, users) => {
     for (let user of users) {
       user.age = Math.trunc((new Date() - user.birthday) / 31536000000);
     }
