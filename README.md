@@ -12,7 +12,7 @@ Los dos enfoques son válidos y tienen sus usos, ventajas y desventajas. Parte d
 
 ## Modelo Vista Controlador
 
-MVC hace referencia a una forma de estructurar una aplicación, independientemente del lenguaje de programación, _frameworks_ y tecnologías usadas. Si investigan sobre el tema en Internet van a encontrar que en este tipo de cosas los ingenieros y programadores no suelen ponerse de acuerdo. Así que lo que digo a continuación tomenlo como una opinión, lo que yo entiendo que es MVC, otros dirán que eso no es MVC. Esa discusión se la dejo a los académicos de la universidad.
+MVC hace referencia a una forma de estructurar una aplicación, independientemente del lenguaje de programación, _frameworks_ y tecnologías usadas. Si investigan sobre el tema en Internet van a encontrar que en este tipo de cosas los ingenieros y programadores no suelen ponerse de acuerdo. Así que lo que digo a continuación tomenlo como una opinión, lo que yo entiendo que es MVC, otros dirán que eso no es MVC. Esa discusión se la dejo a los académicos, yo les doy la versión de MVC sacada de [este tutorial de MDN](https://developer.mozilla.org/es/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website) pero con una app mucho más modesta.
 
 La idea importante es separar la aplicación en tres capas, una capa más cercana a la base de datos: **los modelos**, una para la interfaz de usuario: **las vistas** y una capa en el medio que interactúa con los modelos para traer información de la base de datos, y lleva esa información a las vistas para mostrarla al usuario: **los controladores**. Como interfaz entre el cliente y los controladores tenemos **las rutas**. Cada una de estas partes de la aplicación tienen su directorio (carpeta) en el proyecto: `models`, `views`, `controllers` y `routes` por sus nombres en inglés. La estructura del directorio del proyecto cuando esté terminado será la siguiente.
 
@@ -334,4 +334,12 @@ else
 hr
 ```
 
-Para cada elemento `user` en el array `users` creamos un `tr` con los cinco `td` usando los valores correspondientes. Y listo, la app está terminada. La pushean a un repo en GitHub, la conectan con Heroku configuran la variable `MONGODB_URI` como hicieron para [hello-database](https://github.com/santiagotrini/hello-database) y listo.
+Para cada elemento `user` en el array `users` creamos un `tr` con los cinco `td` usando los valores correspondientes. Y listo, la app está terminada. La pushean a un repo en GitHub, la conectan con Heroku configuran la variable `MONGODB_URI` como hicieron para [hello-database](https://github.com/santiagotrini/hello-database) y listo. Pueden ver el resultado final en [mi app de Heroku](https://hello-pug.herokuapp.com/).
+
+## ¿Y ahora?
+
+Ahora seguimos con [hello-crud](https://github.com/santiagotrini/hello-crud), CRUD es el acrónimo en inglés para Create Read Update Delete, las cuatro operaciones básicas en una base de datos. En esa guía vamos a hacer la API para una app de tomar notas.
+
+Por otro lado también podemos seguir explorando tecnologías que usamos en desarrollo web como WebSockets en [hello-websockets](https://github.com/santiagotrini/hello-websockets) haciendo una sencilla app de chat.
+
+Por último no dejen de ver [hello-postgre](https://github.com/santiagotrini/hello-postgre) si son fanáticos de las bases de datos relacionales y SQL.
