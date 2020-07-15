@@ -14,6 +14,8 @@ Los dos enfoques son válidos y tienen sus usos, ventajas y desventajas. Parte d
 
 MVC hace referencia a una forma de estructurar una aplicación, independientemente del lenguaje de programación, _frameworks_ y tecnologías usadas. Si investigan sobre el tema en Internet van a encontrar que en este tipo de cosas los ingenieros y programadores no suelen ponerse de acuerdo. Así que lo que digo a continuación tomenlo como una opinión, lo que yo entiendo que es MVC, otros dirán que eso no es MVC. Esa discusión se la dejo a los académicos, yo les doy la versión de MVC sacada de [este tutorial de MDN](https://developer.mozilla.org/es/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website) pero con una app mucho más modesta.
 
+![mvc](./img/mvc.png)
+
 La idea importante es separar la aplicación en tres capas, una capa más cercana a la base de datos: **los modelos**, una para la interfaz de usuario: **las vistas** y una capa en el medio que interactúa con los modelos para traer información de la base de datos, y lleva esa información a las vistas para mostrarla al usuario: **los controladores**. Como interfaz entre el cliente y los controladores tenemos **las rutas**. Cada una de estas partes de la aplicación tienen su directorio (carpeta) en el proyecto: `models`, `views`, `controllers` y `routes` por sus nombres en inglés. La estructura del directorio del proyecto cuando esté terminado será la siguiente.
 
 ```
